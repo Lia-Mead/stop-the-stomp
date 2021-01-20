@@ -8,6 +8,8 @@ const hb = require("express-handlebars");
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
+app.use(express.static("./public"));
+
 // middleware
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
@@ -16,64 +18,84 @@ app.use((req, res, next) => {
     if (req.url == "/petition") {
         next();
     } else {
-        if (req.cookies.sign) {
-            res.redirect("/thanks");
-            // next();
+        if (req.cookies.signed) {
+            next();
         } else {
-            // res.cookie("signedCookie", req.sign);
             res.redirect("/petition");
         }
     }
 });
-// app.use((req, res) => {
-//     if (req.url == "/petition") {
-//         if (req.cookies.sign) {
-//             res.redirect("/thanks");
-//         } else {
-//             res.cookie("sign", req.sign);
-//             res.redirect("/petition");
-//         }
-//     }
-// });
-
-app.use(express.static("./public"));
 
 app.get("/petition", (req, res) => {
-    // res.render("petition", {
-    //     title: "petition",
-    //     layout: "main",
-    // });
-    res.send(`
-        <form method='POST' style="display: flex; flex-direction: column; justify-content: space-between; width: 60%; height: 20%; font-family: Arial">
-            <button name="sign" type="submit" style="padding: 15px; background-color:#9bffdd">Submit</button>
-        </form>`);
-});
-
-app.post("/petition", (req, res) => {
-    console.log("post to petition was made");
-    const { sign } = req.body;
-    console.log("req.body: ", req.body);
-
-    if (sign) {
-        res.cookie("sign", true);
-        res.redirect("/thanks");
+    if (!req.cookies.signed) {
+        res.render("petition", {
+            title: "petition",
+            layout: "main",
+        });
     } else {
-        res.send("You need to sign");
+        res.redirect("/thanks");
     }
 });
 
+app.post("/petition", (req, res) => {
+    // console.log("post to petition was made");
+    console.log("req.body", req.body);
+    const { first, last, signature } = req.body;
+
+    if (first && last && signature) {
+        res.cookie("signed", true);
+        res.redirect("/thanks");
+    } else {
+        res.render("petition", {
+            title: "Petition Page",
+            errorMessage: "There was an error, please fill out all forms",
+        });
+    }
+    // console.log("req.body: ", req.body);
+    db.getSignature(first, last, signature)
+        .then(() => {
+            console.log("results from getSignature: ");
+        })
+        .catch((err) => {
+            console.log("err in dataBase: ", err);
+        });
+});
+
 app.get("/thanks", (req, res) => {
-    res.render("thanks", {
-        title: "thanks",
-        layout: "main",
-    });
+    if (req.cookies.signed) {
+        db.numSignatures()
+            .then(({ rows }) => {
+                res.render("thanks", {
+                    title: "Thanks Page",
+                    layout: "main",
+                    rows,
+                });
+            })
+            .catch((err) => {
+                console.log("error in getAllSignatures: ", err);
+            });
+    } else {
+        res.redirect("/petition");
+    }
 });
 
 app.get("/signers", (req, res) => {
-    res.render("signers", {
-        title: "signers",
-        layout: "main",
-    });
+    if (req.cookies.signed) {
+        db.getAllSignatures()
+            .then(({ rows }) => {
+                // console.log("result.rows: ", rows);
+                res.render("signers", {
+                    title: "signers",
+                    layout: "main",
+                    rows,
+                });
+            })
+            .catch((err) => {
+                console.log("error in getAllSignatures", err);
+            });
+    } else {
+        res.redirect("/petition");
+    }
 });
 
 app.listen(8080, () => {
