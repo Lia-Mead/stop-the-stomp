@@ -1,24 +1,42 @@
 const express = require("express");
 const app = express();
 const db = require("./db");
-const cookieParser = require("cookie-parser");
-// getting info from db
-
+const csurf = require("csurf");
+const cookieSession = require("cookie-session");
+const { sessionSecret } = require("./secrets");
 const hb = require("express-handlebars");
+
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
+// middleware
+app.use(function (req, res, next) {
+    res.setHeader("x-frame-options", "deny");
+    next();
+});
+
 app.use(express.static("./public"));
 
-// middleware
-app.use(cookieParser());
+app.use(
+    cookieSession({
+        maxAge: 1000 * 60 * 24 * 14,
+        secret: sessionSecret,
+    })
+);
 app.use(express.urlencoded({ extended: false }));
+app.use(csurf());
+
+app.use(function (req, res, next) {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.use((req, res, next) => {
+    // console.log("req.session in middleware", req.session);
     if (req.url == "/petition") {
         next();
     } else {
-        if (req.cookies.signed) {
+        if (req.session.signatureId) {
             next();
         } else {
             res.redirect("/petition");
@@ -27,7 +45,8 @@ app.use((req, res, next) => {
 });
 
 app.get("/petition", (req, res) => {
-    if (!req.cookies.signed) {
+    // console.log("req.session", req.session);
+    if (!req.session.signatureId) {
         res.render("petition", {
             title: "petition",
             layout: "main",
@@ -39,40 +58,50 @@ app.get("/petition", (req, res) => {
 
 app.post("/petition", (req, res) => {
     // console.log("post to petition was made");
-    console.log("req.body", req.body);
+    // console.log("req.body", req.body);
+    // console.log("req.session", req.session);
     const { first, last, signature } = req.body;
 
     if (first && last && signature) {
-        res.cookie("signed", true);
-        res.redirect("/thanks");
+        db.getSignature(first, last, signature)
+            .then(({ rows }) => {
+                req.session.signatureId = rows[0].id;
+                // console.log("signatureId: ", req.session.signatureId);
+                res.redirect("/thanks");
+            })
+            .catch((err) => {
+                console.log("err in dataBase: ", err);
+            });
     } else {
         res.render("petition", {
             title: "Petition Page",
             errorMessage: "There was an error, please fill out all forms",
         });
     }
-    // console.log("req.body: ", req.body);
-    db.getSignature(first, last, signature)
-        .then(() => {
-            console.log("results from getSignature: ");
-        })
-        .catch((err) => {
-            console.log("err in dataBase: ", err);
-        });
 });
 
+// NEW
 app.get("/thanks", (req, res) => {
-    if (req.cookies.signed) {
-        db.numSignatures()
-            .then(({ rows }) => {
-                res.render("thanks", {
-                    title: "Thanks Page",
-                    layout: "main",
-                    rows,
+    if (req.session.signatureId) {
+        Promise.all([db.pullSig(req.session.signatureId), db.numSignatures()])
+            .then((results) => {
+                // console.log("results: ", results);
+                let signature = results[0].rows[0].signature;
+                let count = results[1].rows[0].count;
+
+                db.pullSig(req.session.signatureId).then(({ rows }) => {
+                    db.numSignatures({ rows });
+                    return res.render("thanks", {
+                        title: "Thanks Page",
+                        layout: "main",
+                        rows,
+                        signature,
+                        count,
+                    });
                 });
             })
             .catch((err) => {
-                console.log("error in getAllSignatures: ", err);
+                console.log("err in pulling signature: ", err);
             });
     } else {
         res.redirect("/petition");
@@ -80,7 +109,8 @@ app.get("/thanks", (req, res) => {
 });
 
 app.get("/signers", (req, res) => {
-    if (req.cookies.signed) {
+    // console.log("req.session: ", req.session);
+    if (req.session.signatureId) {
         db.getAllSignatures()
             .then(({ rows }) => {
                 // console.log("result.rows: ", rows);
@@ -101,31 +131,3 @@ app.get("/signers", (req, res) => {
 app.listen(8080, () => {
     console.log("petition server is listening...");
 });
-
-// app.get("/actors", (req, res) => {
-//     db.getActors()
-//         .then(({ rows }) => {
-//             console.log("results from getActors: ", rows);
-//         })
-//         .catch((err) => {
-//             console.log("err in dataBase: ", err);
-//         });
-// });
-
-// // .then((results) => {
-// //             console.log("results from getActors: ", results.rows);
-// //         })
-
-// // adding info from db
-// app.post("/add-actor", (req, res) => {
-//     console.log("hit POST add-actor route");
-
-//     // we have yet to create the query
-//     db.getActor("Janelle Monae", 35)
-//         .then(() => {
-//             console.log("yay it worked");
-//         })
-//         .catch((err) => {
-//             console.log("err in AddActor", err);
-//         });
-// });

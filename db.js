@@ -3,7 +3,6 @@
 const spicedPg = require("spiced-pg");
 const { dbUsername, dbPass } = require("./secrets");
 const db = spicedPg(`postgres:${dbUsername}:${dbPass}@localhost:5432/petition`);
-// spicesPg (whoDoWeWantToTalkTo:WhichUserShouldBeRunningOurQueries:WhatPasswordDoesThisUserHave@whereCommunicationHappens:specifiedPortForCommunication/NameOfOurDataBase)
 
 module.exports.getAllSignatures = () => {
     const q = `SELECT first, last FROM signatures`;
@@ -12,14 +11,9 @@ module.exports.getAllSignatures = () => {
 
 module.exports.getSignature = (firstName, lastName, signature) => {
     const q = `INSERT INTO signatures (first, last, signature)
-    VALUES ($1,$2, $3)`;
+    VALUES ($1,$2, $3) RETURNING id`;
     const params = [firstName, lastName, signature];
     return db.query(q, params);
-    // return db.query(
-    //     `INSERT INTO actors (name, age)
-    // VALUES ($1,$2)`,
-    //     [actorName, actorAge]
-    // );
 };
 
 module.exports.numSignatures = () => {
@@ -28,19 +22,8 @@ module.exports.numSignatures = () => {
     return db.query(q);
 };
 
-// module.exports.getActors = () => {
-//     const q = `SELECT * FROM actors`;
-//     return db.query(q);
-// };
-
-// module.exports.getActor = (actorName, actorAge) => {
-//     const q = `INSERT INTO actors (name, age)
-//     VALUES ($1,$2)`;
-//     const params = [actorName, actorAge];
-//     return db.query(q, params);
-//     // return db.query(
-//     //     `INSERT INTO actors (name, age)
-//     // VALUES ($1,$2)`,
-//     //     [actorName, actorAge]
-//     // );
-// };
+module.exports.pullSig = (signature) => {
+    const q = `SELECT signature FROM signatures WHERE id = $1`;
+    const params = [signature];
+    return db.query(q, params);
+};
