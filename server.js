@@ -35,19 +35,121 @@ app.use(function (req, res, next) {
     next();
 });
 
+// app.use((req, res, next) => {
+//     if (req.url == "/login") {
+//         next();
+//     } else if (req.url == "/register") {
+//         next();
+//     } else if (req.url == "/petition") {
+//         next();
+//     } else {
+//         if (req.session.signatureId) {
+//             next();
+//         } else if (req.session.userId) {
+//             next();
+//         } else if (req.session.loggedIn) {
+//             next();
+//         } else {
+//             res.redirect("/register");
+//         }
+//     }
+// });
+
 // this doesn't work
-app.use((req, res, next) => {
-    // console.log("req.session in middleware", req.session);
-    if (req.url == "/petition") {
-        next();
+
+// app.use((req, res, next) => {
+//     // console.log("req.session in middleware", req.session);
+//     if (req.url == "/petition") {
+//         next();
+//     } else {
+//         if (req.session.signatureId) {
+//             next();
+//         } else {
+//             res.redirect("/petition");
+//         }
+//     }
+// });
+
+// app.use((req, res, next) => {
+//     next();
+// });
+
+// app.use((req, res, next) => {
+//     if (req.url == "/petition") {
+//         next();
+//     } else {
+//         if (
+//             req.session.signatureId ||
+//             req.session.uderId ||
+//             req.session.loggedIn
+//         ) {
+//             next();
+//         } else {
+//             res.redirect("/petition");
+//         }
+//     }
+// });
+
+//  !req.session.userId;
+// return res.redirect("/register");
+
+// app.use((req, res, next) => {
+//     if (req.url == "/petition" && !req.session.userId) {
+//         return res.redirect("/register");
+//     } else if (req.url == "/petition" && !req.session.loggedIn) {
+//         return res.redirect("/login");
+//     } else if (req.url == "/register" && req.session.userId) {
+//         return res.redirect("/login");
+//     }
+//     next();
+// });
+
+// app.use((req, res, next) => {
+//     if (req.url == "/petition" && !req.session.userId) {
+//         return res.redirect("/register");
+//     } else if (req.url == "/petition" && !req.session.loggedIn) {
+//         return res.redirect("/login");
+//     }
+//     next();
+// });
+
+//almost working last version
+// app.use((req, res, next) => {
+//     if (req.url == "/petition") {
+//         if (!req.session.userId) {
+//             console.log("userId", req.session.userId);
+//             return res.redirect("/register");
+//         } else if (!req.session.loggedIn && req.session.userId) {
+//             console.log("userId", req.session.userId);
+
+//             return res.redirect("/login");
+//         }
+//         // res.redirect("/petition");
+//     }
+//     next();
+// });
+
+// app.use((req, res, next) => {
+//     next();
+// });
+
+app.get("/", (req, res) => {
+    if (!req.session.userId) {
+        // console.log("userId", req.session.userId);
+        console.log("no user id - sign up");
+        res.redirect("/register");
+    } else if (!req.session.loggedIn && req.session.userId) {
+        // console.log("userId", req.session.userId);
+        console.log("not logged in - log in");
+
+        res.redirect("/login");
     } else {
-        if (req.session.signatureId) {
-            next();
-        } else {
-            res.redirect("/petition");
-        }
+        console.log("go to petition");
+        res.redirect("/petition");
     }
 });
+
+// req.session.signatureId;
 
 app.get("/register", (req, res) => {
     res.render("registration", {
@@ -64,12 +166,24 @@ app.post("/register", (req, res) => {
             db.insertRegData(first, last, email, hashedPw)
                 .then(({ rows }) => {
                     req.session.userId = rows[0].id;
-                    // console.log("req.session.userId", req.session.userId);
+                    req.session.loggedIn === true;
+                    console.log("req.session.userId", req.session.userId);
+                    console.log("rows[0]", rows[0]);
+
                     res.redirect("/petition");
                 })
                 .catch((err) => {
                     console.log("error in insert reg data", err);
+                    res.render("registration", {
+                        title: "Sign Up Page",
+                        errorMessage: "Something went wrong in the DB.",
+                    });
                 });
+        });
+    } else {
+        res.render("registration", {
+            title: "Sign Up Page",
+            errorMessage: "Something went wrong. Please fill out all fields",
         });
     }
 });
@@ -82,53 +196,98 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    // cmopare values
-    // go to db, check if the email the user provided existes, and if yes - retrive stored hash and pass that to compare are the second argument
-    // const hashFromDB = "someHash"; // actual pass from db
     const { email, pass } = req.body;
     if (email) {
         db.getLoginData(email)
             .then(({ rows }) => {
-                // const emailDB = rows[0].email;
                 // console.log("email matches! yay");
                 const hashedPw = rows[0].password;
                 compare(pass, hashedPw)
                     .then((match) => {
-                        console.log("match value from compare: ", match);
-                        req.session.loggedIn = rows[0].id;
-                        console.log(
-                            "req.session.loggedIn",
-                            req.session.loggedIn
-                        );
-                        res.redirect("./petition");
-                        // if pass matches set new cookie with userId
-                        // if not oops sth went wrong
+                        // console.log("match value from compare: ", match);
+                        if (match) {
+                            req.session.loggedIn = rows[0].id;
+                            if (req.session.signatureId) {
+                                res.redirect("./thanks");
+                            } else {
+                                res.redirect("./petition");
+                            }
+                        } else {
+                            res.render("login", {
+                                title: "Login Page",
+                                errorMessage: "Something went wrong",
+                            });
+                        }
                     })
                     .catch((err) => {
                         console.log("err in compare", err);
                     });
             })
             .catch((err) => {
-                console.log("err in compare", err);
+                console.log("err in login data", err);
+                res.render("login", {
+                    title: "Login Page",
+                    errorMessage: "Something went wrong",
+                });
             });
-    } else {
-        res.render("login", {
-            title: "Login Page",
-            errorMessage: "Something went wrong",
-        });
     }
 });
 
+// app.get("/petition", (req, res) => {
+//     // console.log("req.session", req.session);
+//     if (req.session.signatureId) {
+//         return res.redirect("/thanks");
+//     } else {
+//         return res.render("petition", {
+//             title: "Petition Page",
+//             layout: "main",
+//         });
+//     }
+
 app.get("/petition", (req, res) => {
     // console.log("req.session", req.session);
-    if (!req.session.signatureId) {
+    if (!req.session.userId && !req.session.loggedIn) {
+        res.redirect("/register");
+    } else if (!req.session.loggedIn && req.session.userId) {
+        res.redirect("/login");
+    } else if (req.session.signatureId) {
+        res.redirect("/thanks");
+    } else {
         res.render("petition", {
-            title: "petition",
+            title: "Petition Page",
             layout: "main",
         });
-    } else {
-        res.redirect("/thanks");
     }
+
+    // app.get("/petition", (req, res) => {
+    //     // console.log("req.session", req.session);
+    //     if (!req.session.signatureId) {
+    //         if (!req.session.userId) {
+    //             res.redirect("/register");
+    //         } else if (!req.session.loggedIn) {
+    //             res.redirect("/login");
+    //         }
+    //         res.render("petition", {
+    //             title: "Petition Page",
+    //             layout: "main",
+    //         });
+    //     } else {
+    //         res.redirect("/thanks");
+    //     }
+
+    // if (!req.session.signatureId) {
+    //     // if (!req.session.loggedIn) {
+    //     //     console.log("login");
+    //     // } else if (!req.session.userId) {
+    //     //     console.log("register");
+    //     // }
+    //     res.render("petition", {
+    //         title: "petition",
+    //         layout: "main",
+    //     });
+    // } else {
+    //     res.redirect("/thanks");
+    // }
 });
 
 app.post("/petition", (req, res) => {
@@ -137,22 +296,25 @@ app.post("/petition", (req, res) => {
 
     const { signature } = req.body;
     // const { first, last, signature } = req.body;
-
-    if (signature) {
-        db.insertSignature(signature)
-            .then(({ rows }) => {
-                req.session.signatureId = rows[0].id;
-                // console.log("signatureId: ", req.session.signatureId);
-                res.redirect("/thanks");
-            })
-            .catch((err) => {
-                console.log("err in dataBase: ", err);
+    if (req.session.userId && req.session.loggedIn) {
+        if (signature) {
+            db.insertSignature(signature, req.session.userId)
+                .then(({ rows }) => {
+                    req.session.signatureId = rows[0].id;
+                    // console.log("rows[0].id", rows[0].id);
+                    // console.log("req.session", req.session);
+                    res.redirect("/thanks");
+                })
+                .catch((err) => {
+                    console.log("err in dataBase: ", err);
+                });
+        } else {
+            res.render("petition", {
+                title: "Petition Page",
+                errorMessage:
+                    "There was an error, please fill out all the fields",
             });
-    } else {
-        res.render("petition", {
-            title: "Petition Page",
-            errorMessage: "There was an error, please fill out all forms",
-        });
+        }
     }
 });
 
@@ -161,18 +323,12 @@ app.get("/thanks", (req, res) => {
         Promise.all([db.pullSig(req.session.signatureId), db.numSignatures()])
             .then((results) => {
                 // console.log("results: ", results);
-                let signature = results[0].rows[0].signature;
+                let sigImg = results[0].rows[0].signature;
                 let count = results[1].rows[0].count;
-
-                db.pullSig(req.session.signatureId).then(({ rows }) => {
-                    db.numSignatures({ rows });
-                    return res.render("thanks", {
-                        title: "Thanks Page",
-                        layout: "main",
-                        rows,
-                        signature,
-                        count,
-                    });
+                return res.render("thanks", {
+                    title: "Thanks Page",
+                    sigImg,
+                    count,
                 });
             })
             .catch((err) => {

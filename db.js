@@ -9,10 +9,10 @@ module.exports.getAllSignatures = () => {
     return db.query(q);
 };
 
-module.exports.insertSignature = (signature) => {
-    const q = `INSERT INTO signatures (signature)
-    VALUES ($1) RETURNING id`;
-    const params = [signature];
+module.exports.insertSignature = (signature, userId) => {
+    const q = `INSERT INTO signatures (signature, user_id)
+    VALUES ($1, $2) RETURNING id`;
+    const params = [signature, userId];
     return db.query(q, params);
 };
 
@@ -20,6 +20,7 @@ module.exports.insertRegData = (first, last, email, hashedPw) => {
     const q = `INSERT INTO users (first, last, email, password)
     VALUES ($1, $2, $3, $4) RETURNING id`;
     const params = [first, last, email, hashedPw];
+    console.log("params", params);
     return db.query(q, params);
 };
 

@@ -6,7 +6,6 @@
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const sigId = document.getElementById("sig-id");
-    let dataURL = canvas.toDataURL();
     // console.log("dataURL: ", dataURL);
 
     // dataUrl Logic
@@ -33,7 +32,7 @@
             x = 0;
             y = 0;
             isDrawing = false;
-            sigId.value = dataURL;
+            sigId.value = canvas.toDataURL();
             // console.log("dataURL", dataURL);
         }
     });

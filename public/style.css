@@ -11,18 +11,21 @@ body {
 }
 
 #body-main {
-    height: 95%;
+    height: calc(100vh - 60px);
+    width: 100vw;
 }
 
 footer {
-    height: 20px;
+    height: 60px;
     background: aliceblue;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
-/* .foot-note {
-} */
+.foot-note {
+    font-size: 0.8em;
+}
 
 h1 {
     margin: 30px 30px 0;
@@ -35,8 +38,9 @@ h2 {
 
 #canvas {
     background-color: white;
-    border-radius: 22px;
+    border-radius: 13px;
     margin: 20px;
+    padding: 7px;
 }
 
 #sig-canvas {
@@ -83,15 +87,11 @@ h2 {
 
 /* .main-page {
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    align-items: center;
-    flex-flow: row wrap;
-    flex-wrap: wrap;
 } */
 
 .form {
-    width: 80%;
+    /* width: 80%; */
     display: flex;
     justify-content: center;
     flex-flow: row wrap;
@@ -118,4 +118,12 @@ input {
     border-radius: 3%;
     width: 40%;
     margin: 5px 10px;
+}
+
+.bg-img {
+    width: 100%;
+    object-fit: cover;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        url("/images/bg-img.jpg");
 }
