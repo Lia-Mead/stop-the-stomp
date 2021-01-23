@@ -1,5 +1,36 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
 body {
     background-color: pink;
+    font-family: proxima-nova-1, proxima-nova-2, montserrat, Helve;
+    height: 100vh;
+    width: 100vw;
+}
+
+#body-main {
+    height: 95%;
+}
+
+footer {
+    height: 20px;
+    background: aliceblue;
+    display: flex;
+    justify-content: center;
+}
+
+/* .foot-note {
+} */
+
+h1 {
+    margin: 30px 30px 0;
+    font-size: 1.8em;
+}
+
+h2 {
+    margin: 30px 30px 0;
 }
 
 #canvas {
@@ -12,4 +43,79 @@ body {
     border: 2px dotted #cccccc;
     border-radius: 22px;
     cursor: crosshair;
+}
+
+#btn {
+    width: 212px;
+    padding: 16px;
+    height: 60px;
+    font-size: 1.5em;
+    background: transparent;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0px 0px 0px #fff;
+    border: #46434e solid 2px;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+}
+#btn::after {
+    top: 0px;
+    left: 0px;
+    width: 0%;
+    height: 100%;
+
+    background-image: -webkit-linear-gradient(left, #fff, transparent);
+    background-image: -moz-linear-gradient(left, #fff, transparent);
+    background-image: -o-linear-gradient(left, #fff, transparent);
+    z-index: -1;
+}
+#btn:hover::after {
+    width: 800%;
+}
+#btn:hover {
+    color: hotpink;
+
+    box-shadow: 0px 20px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* .main-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-flow: row wrap;
+    flex-wrap: wrap;
+} */
+
+.form {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+    flex-wrap: wrap;
+}
+
+.form-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+}
+
+.form-con {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+input {
+    padding: 20px;
+    border-radius: 3%;
+    width: 40%;
+    margin: 5px 10px;
 }
