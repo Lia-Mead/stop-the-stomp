@@ -256,7 +256,7 @@ h2 {
     align-items: center;
 }
 
-.form-con {
+.petition-con {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -303,5 +303,9 @@ a:-webkit-any-link:active {
 
 .signer-elem {
     padding: 10px;
+    color: #dcd285;
+}
+
+.fade {
     color: #65fde9;
 }

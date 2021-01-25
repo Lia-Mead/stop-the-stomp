@@ -92,7 +92,7 @@ app.post("/register", (req, res) => {
                     console.log("i am logged in", req.session.loggedIn);
                     console.log("cookie log in", req.session);
 
-                    res.redirect("/petition");
+                    res.redirect("/profile");
                 })
                 .catch((err) => {
                     console.log("error in insert reg data", err);
@@ -108,6 +108,33 @@ app.post("/register", (req, res) => {
             errorMessage: "Something went wrong. Please fill out all fields",
         });
     }
+});
+
+app.get("/profile", (req, res) => {
+    res.render("profile", {
+        title: "Profile",
+        layout: "main",
+    });
+});
+
+app.post("/profile", (req, res) => {
+    // console.log("profile post request made");
+    let { age, city, url } = req.body;
+
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+        url = req.body.url;
+    } else {
+        url = "";
+    }
+
+    db.insUserProf(age, city, url, req.session.userId)
+        .then(() => {
+            // console.log("profile data city, url");
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("error in insUserProf", err);
+        });
 });
 
 app.get("/login", (req, res) => {
@@ -235,7 +262,7 @@ app.get("/thanks", (req, res) => {
 app.get("/signers", (req, res) => {
     // console.log("req.session: ", req.session);
     if (req.session.signatureId) {
-        db.getAllSignatures()
+        db.getAllSigners()
             .then(({ rows }) => {
                 // console.log("result.rows: ", rows);
                 res.render("signers", {
@@ -245,11 +272,27 @@ app.get("/signers", (req, res) => {
                 });
             })
             .catch((err) => {
-                console.log("error in getAllSignatures", err);
+                console.log("error in getAllSigners", err);
             });
     } else {
         res.redirect("/petition");
     }
+});
+
+app.get("/signers/:city", (req, res) => {
+    const { city } = req.params;
+    db.filterByCity(city)
+        .then(({ rows }) => {
+            console.log("rows:", rows);
+            res.render("city", {
+                title: "Signers in your city",
+                layout: "main",
+                rows,
+            });
+        })
+        .catch((err) => {
+            console.log("err in filetering city: ", err);
+        });
 });
 
 app.listen(8080, () => {
