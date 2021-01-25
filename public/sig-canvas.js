@@ -39,7 +39,7 @@
 
     function startDraw(ctx, x1, y1, x2, y2) {
         ctx.beginPath();
-        ctx.strokeStyle = "hotpink";
+        ctx.strokeStyle = "#74ff7a";
         ctx.lineWidth = 3;
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);

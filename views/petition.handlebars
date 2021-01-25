@@ -1,16 +1,23 @@
 
-<section class="main-page">
+<section class="main-page bg-img">
 
         <div class="form-con">
 
-        <h1>Please sign our petition</h1>
-                <form class="form" method='POST'>
-                        <h2>Please sign here</h2>
+        {{!-- <h1>Stop making stupid people famous</h1> --}}
+
+        <div class='headline'>
+                <p>Stop Making
+                <br>Stupid People <br>Famous
+                </p>
+        </div>
+
+                <form class="sig-page" method='POST'>
+                        <h2>Sign Here to Create Change</h2>
                         <input id="sig-id" type="hidden" name="signature">
                         
-                        <canvas id="canvas" width="600" height="100"></canvas>
+                        <canvas id="canvas" width="400" height="100"></canvas>
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                        <button id="btn" type="submit"> submit </button>
+                        <button class="glow" type="submit"> submit </button>
                 </form>
 
                 <p>{{errorMessage}}</p>

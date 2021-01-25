@@ -35,26 +35,6 @@ app.use(function (req, res, next) {
     next();
 });
 
-// app.use((req, res, next) => {
-//     if (req.url == "/login") {
-//         next();
-//     } else if (req.url == "/register") {
-//         next();
-//     } else if (req.url == "/petition") {
-//         next();
-//     } else {
-//         if (req.session.signatureId) {
-//             next();
-//         } else if (req.session.userId) {
-//             next();
-//         } else if (req.session.loggedIn) {
-//             next();
-//         } else {
-//             res.redirect("/register");
-//         }
-//     }
-// });
-
 // this doesn't work
 
 // app.use((req, res, next) => {
@@ -70,82 +50,22 @@ app.use(function (req, res, next) {
 //     }
 // });
 
-// app.use((req, res, next) => {
-//     next();
-// });
-
-// app.use((req, res, next) => {
-//     if (req.url == "/petition") {
-//         next();
-//     } else {
-//         if (
-//             req.session.signatureId ||
-//             req.session.uderId ||
-//             req.session.loggedIn
-//         ) {
-//             next();
-//         } else {
-//             res.redirect("/petition");
-//         }
-//     }
-// });
-
-//  !req.session.userId;
-// return res.redirect("/register");
-
-// app.use((req, res, next) => {
-//     if (req.url == "/petition" && !req.session.userId) {
-//         return res.redirect("/register");
-//     } else if (req.url == "/petition" && !req.session.loggedIn) {
-//         return res.redirect("/login");
-//     } else if (req.url == "/register" && req.session.userId) {
-//         return res.redirect("/login");
-//     }
-//     next();
-// });
-
-// app.use((req, res, next) => {
-//     if (req.url == "/petition" && !req.session.userId) {
-//         return res.redirect("/register");
-//     } else if (req.url == "/petition" && !req.session.loggedIn) {
-//         return res.redirect("/login");
-//     }
-//     next();
-// });
-
-//almost working last version
-// app.use((req, res, next) => {
-//     if (req.url == "/petition") {
-//         if (!req.session.userId) {
-//             console.log("userId", req.session.userId);
-//             return res.redirect("/register");
-//         } else if (!req.session.loggedIn && req.session.userId) {
-//             console.log("userId", req.session.userId);
-
-//             return res.redirect("/login");
-//         }
-//         // res.redirect("/petition");
-//     }
-//     next();
-// });
-
-// app.use((req, res, next) => {
-//     next();
-// });
-
 app.get("/", (req, res) => {
-    if (!req.session.userId) {
+    if (!req.session.loggedIn && req.session.userId) {
         // console.log("userId", req.session.userId);
         console.log("no user id - sign up");
-        res.redirect("/register");
-    } else if (!req.session.loggedIn && req.session.userId) {
-        // console.log("userId", req.session.userId);
-        console.log("not logged in - log in");
-
+        // console.log("not logged in - log in");
         res.redirect("/login");
+    } else if (!req.session.userId) {
+        // console.log("userId", req.session.userId);
+        console.log("no user id - sign up");
+
+        res.redirect("/register");
+        // console.log("cookie log in", req.session);
     } else {
         console.log("go to petition");
         res.redirect("/petition");
+        // console.log("cookie log in", req.session);
     }
 });
 
@@ -166,9 +86,11 @@ app.post("/register", (req, res) => {
             db.insertRegData(first, last, email, hashedPw)
                 .then(({ rows }) => {
                     req.session.userId = rows[0].id;
-                    req.session.loggedIn === true;
-                    console.log("req.session.userId", req.session.userId);
-                    console.log("rows[0]", rows[0]);
+                    req.session.loggedIn = rows[0].id;
+                    // req.session.loggedIn === true; // check why not loggedin
+                    // console.log("req.session.userId", req.session.userId);
+                    console.log("i am logged in", req.session.loggedIn);
+                    console.log("cookie log in", req.session);
 
                     res.redirect("/petition");
                 })
@@ -207,15 +129,20 @@ app.post("/login", (req, res) => {
                         // console.log("match value from compare: ", match);
                         if (match) {
                             req.session.loggedIn = rows[0].id;
+                            console.log("cookie log in", req.session);
+
                             if (req.session.signatureId) {
+                                console.log("cookie log in", req.session);
                                 res.redirect("./thanks");
                             } else {
+                                console.log("cookie log in", req.session);
                                 res.redirect("./petition");
                             }
                         } else {
                             res.render("login", {
                                 title: "Login Page",
-                                errorMessage: "Something went wrong",
+                                errorMessage:
+                                    "Something went wrong, wrong password",
                             });
                         }
                     })
@@ -227,67 +154,31 @@ app.post("/login", (req, res) => {
                 console.log("err in login data", err);
                 res.render("login", {
                     title: "Login Page",
-                    errorMessage: "Something went wrong",
+                    errorMessage: "Something went wrong, wrong email",
                 });
             });
     }
 });
 
-// app.get("/petition", (req, res) => {
-//     // console.log("req.session", req.session);
-//     if (req.session.signatureId) {
-//         return res.redirect("/thanks");
-//     } else {
-//         return res.render("petition", {
-//             title: "Petition Page",
-//             layout: "main",
-//         });
-//     }
-
+// this part doenst work with inserting the sig anymore
 app.get("/petition", (req, res) => {
     // console.log("req.session", req.session);
+
     if (!req.session.userId && !req.session.loggedIn) {
         res.redirect("/register");
     } else if (!req.session.loggedIn && req.session.userId) {
         res.redirect("/login");
-    } else if (req.session.signatureId) {
-        res.redirect("/thanks");
-    } else {
-        res.render("petition", {
-            title: "Petition Page",
-            layout: "main",
-        });
+    } else if (req.session.loggedIn) {
+        console.log("cookie log in petition", req.session);
+        if (req.session.signatureId) {
+            res.redirect("/thanks");
+        } else {
+            res.render("petition", {
+                title: "Petition Page",
+                layout: "main",
+            });
+        }
     }
-
-    // app.get("/petition", (req, res) => {
-    //     // console.log("req.session", req.session);
-    //     if (!req.session.signatureId) {
-    //         if (!req.session.userId) {
-    //             res.redirect("/register");
-    //         } else if (!req.session.loggedIn) {
-    //             res.redirect("/login");
-    //         }
-    //         res.render("petition", {
-    //             title: "Petition Page",
-    //             layout: "main",
-    //         });
-    //     } else {
-    //         res.redirect("/thanks");
-    //     }
-
-    // if (!req.session.signatureId) {
-    //     // if (!req.session.loggedIn) {
-    //     //     console.log("login");
-    //     // } else if (!req.session.userId) {
-    //     //     console.log("register");
-    //     // }
-    //     res.render("petition", {
-    //         title: "petition",
-    //         layout: "main",
-    //     });
-    // } else {
-    //     res.redirect("/thanks");
-    // }
 });
 
 app.post("/petition", (req, res) => {
@@ -297,6 +188,7 @@ app.post("/petition", (req, res) => {
     const { signature } = req.body;
     // const { first, last, signature } = req.body;
     if (req.session.userId && req.session.loggedIn) {
+        console.log("cookie log in", req.session);
         if (signature) {
             db.insertSignature(signature, req.session.userId)
                 .then(({ rows }) => {
@@ -320,6 +212,7 @@ app.post("/petition", (req, res) => {
 
 app.get("/thanks", (req, res) => {
     if (req.session.signatureId) {
+        // check pullSig - parameter email or userId
         Promise.all([db.pullSig(req.session.signatureId), db.numSignatures()])
             .then((results) => {
                 // console.log("results: ", results);
@@ -362,18 +255,3 @@ app.get("/signers", (req, res) => {
 app.listen(8080, () => {
     console.log("petition server is listening...");
 });
-
-// here hash the password the user gives out of req.body
-// req.body.password (hardcoded for demo purpose)
-
-// hash("whateverUserWantsPass")
-//     .then((hashedPw) => {
-//         console.log("hashedPw in /register:", hashedPw);
-//         // add all user info plus the hashed PW into our db
-//         // if it worked - redirect
-//         // if went wrong - render error message
-//     })
-//     .catch((err) => {
-//         console.log("err in hash", err);
-//     });
-// // redirect to petition - don't send a status
