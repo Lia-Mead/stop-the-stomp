@@ -35,41 +35,15 @@ app.use(function (req, res, next) {
     next();
 });
 
-// this doesn't work
-
-// app.use((req, res, next) => {
-//     // console.log("req.session in middleware", req.session);
-//     if (req.url == "/petition") {
-//         next();
-//     } else {
-//         if (req.session.signatureId) {
-//             next();
-//         } else {
-//             res.redirect("/petition");
-//         }
-//     }
-// });
-
 app.get("/", (req, res) => {
-    if (!req.session.loggedIn && req.session.userId) {
-        // console.log("userId", req.session.userId);
-        console.log("no user id - sign up");
-        // console.log("not logged in - log in");
-        res.redirect("/login");
-    } else if (!req.session.userId) {
-        // console.log("userId", req.session.userId);
-        console.log("no user id - sign up");
-
+    if (!req.session.userId) {
         res.redirect("/register");
-        // console.log("cookie log in", req.session);
+    } else if (!req.session.loggedIn && req.session.userId) {
+        res.redirect("/login");
     } else {
-        console.log("go to petition");
         res.redirect("/petition");
-        // console.log("cookie log in", req.session);
     }
 });
-
-// req.session.signatureId;
 
 app.get("/register", (req, res) => {
     res.render("registration", {
@@ -155,14 +129,17 @@ app.post("/login", (req, res) => {
                     .then((match) => {
                         // console.log("match value from compare: ", match);
                         if (match) {
+                            let signedPetition = rows[0].signature;
+                            req.session.userId = rows[0].id;
                             req.session.loggedIn = rows[0].id;
-                            console.log("cookie log in", req.session);
+                            console.log("rows: ", rows);
+                            console.log("rows sig: ", rows[0].signature);
 
-                            if (req.session.signatureId) {
-                                console.log("cookie log in", req.session);
+                            if (signedPetition) {
+                                console.log("yayy i signed");
                                 res.redirect("./thanks");
                             } else {
-                                console.log("cookie log in", req.session);
+                                console.log("no signed");
                                 res.redirect("./petition");
                             }
                         } else {
@@ -190,13 +167,12 @@ app.post("/login", (req, res) => {
 // this part doenst work with inserting the sig anymore
 app.get("/petition", (req, res) => {
     // console.log("req.session", req.session);
-
     if (!req.session.userId && !req.session.loggedIn) {
         res.redirect("/register");
     } else if (!req.session.loggedIn && req.session.userId) {
         res.redirect("/login");
     } else if (req.session.loggedIn) {
-        console.log("cookie log in petition", req.session);
+        console.log("cookie log in petition: ", req.session);
         if (req.session.signatureId) {
             res.redirect("/thanks");
         } else {
@@ -237,6 +213,7 @@ app.post("/petition", (req, res) => {
     }
 });
 
+// check what to store instead of req.session.signatureId
 app.get("/thanks", (req, res) => {
     if (req.session.signatureId) {
         // check pullSig - parameter email or userId
@@ -261,6 +238,7 @@ app.get("/thanks", (req, res) => {
 
 app.get("/signers", (req, res) => {
     // console.log("req.session: ", req.session);
+    // check if the sig is in the databbase
     if (req.session.signatureId) {
         db.getAllSigners()
             .then(({ rows }) => {
@@ -281,9 +259,11 @@ app.get("/signers", (req, res) => {
 
 app.get("/signers/:city", (req, res) => {
     const { city } = req.params;
+    console.log("city: ", city);
     db.filterByCity(city)
         .then(({ rows }) => {
-            console.log("rows:", rows);
+            console.log("city: ", city);
+            // console.log("rows:", rows);
             res.render("city", {
                 title: "Signers in your city",
                 layout: "main",

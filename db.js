@@ -24,23 +24,6 @@ module.exports.filterByCity = (city) => {
     return db.query(q, params);
 };
 
-// module.exports.getAllSigners = () => {
-//     const q = `SELECT users.first, users.last, user_profiles.age user_profiles.city, user_profiles.url, signatures.signature
-//     FROM users
-//     LEFT JOIN user_profiles
-//     ON users.id = user_profiles.user_id
-//     LEFT JOIN signatures
-//     ON users.id = signatures.user_id`;
-//     return db.query(q);
-// };
-
-// module.exports.displaySignatures = () => {
-//     const q = `SELECT signature FROM signatures
-//     JOIN signature
-//     ON users.id = signatures.user_id`;
-//     return db.query(q);
-// };
-
 module.exports.insertSignature = (signature, userId) => {
     const q = `INSERT INTO signatures (signature, user_id)
     VALUES ($1, $2) RETURNING id`;
@@ -69,7 +52,10 @@ module.exports.pullSig = (signature) => {
 };
 
 module.exports.getLoginData = (email) => {
-    const q = `SELECT * FROM users WHERE email = $1`;
+    const q = `SELECT users.email, users.id, users.password, signatures.signature FROM users
+    JOIN signatures
+    ON users.id = signatures.user_id
+    WHERE email = $1`;
     const params = [email];
     return db.query(q, params);
 };
