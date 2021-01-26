@@ -3,7 +3,7 @@ const app = express();
 const csurf = require("csurf");
 const cookieSession = require("cookie-session");
 const hb = require("express-handlebars");
-const { sessionSecret } = require("./secrets");
+// const { sessionSecret } = require("./secrets");
 
 // let cookie_sec;
 // if (process.env.cookie_secret) {
