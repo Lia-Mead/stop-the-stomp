@@ -5,20 +5,13 @@ const cookieSession = require("cookie-session");
 const hb = require("express-handlebars");
 // const { sessionSecret } = require("./secrets");
 
-// let cookie_sec;
-// if (process.env.cookie_secret) {
-//     cookie_sec = process.env.cookie_secret;
-// } else {
-//     cookie_sec = require("./secrets.json").cookie_secret;
-// }
-
 let cookie_sec;
-if (process.env.cookie_secret) {
+if (process.env.sessionSecret) {
     // we are in production
-    cookie_sec = process.env.cookie_secret;
+    cookie_sec = process.env.sessionSecret;
 } else {
     // we are local and will get our secrets here
-    cookie_sec = require("./secrets.json").cookie_secret;
+    cookie_sec = require("./secrets.json").sessionSecret;
 }
 
 const db = require("./db");
@@ -44,13 +37,6 @@ app.use(
         secret: cookie_sec,
     })
 );
-
-// app.use(
-//     cookieSession({
-//         maxAge: 1000 * 60 * 60 * 24 * 14, // this is in millisecond, equals to 14 days
-//         secret: cookie_sec.sessionSecret,
-//     })
-// );
 
 app.use(express.urlencoded({ extended: false }));
 app.use(csurf());
