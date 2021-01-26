@@ -1,7 +1,7 @@
 // this module holds all the queries we'll be using to talk to our data base
 
 const spicedPg = require("spiced-pg");
-const { dbUsername, dbPass } = require("./secrets");
+// const { dbUsername, dbPass } = require("./secrets");
 // const db = spicedPg(`postgres:${dbUsername}:${dbPass}@localhost:5432/petition`);
 
 let db;
@@ -9,7 +9,7 @@ if (process.env.DATABASE_URL) {
     // this means we are on production - heroku
     db = spicedPg(process.env.DATABASE_URL);
 } else {
-    const { dbuser, dbbpass } = require("./secrets.json");
+    const { dbUsername, dbPass } = require("./secrets.json");
     db = spicedPg(`postgres:${dbUsername}:${dbPass}@localhost:5432/petition`);
 }
 
