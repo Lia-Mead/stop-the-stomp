@@ -259,7 +259,7 @@ app.get("/signers", (req, res) => {
 
 app.get("/signers/:city", (req, res) => {
     const { city } = req.params;
-    console.log("city: ", city);
+    // console.log("city: ", city);
     db.filterByCity(city)
         .then(({ rows }) => {
             console.log("city: ", city);
@@ -275,6 +275,30 @@ app.get("/signers/:city", (req, res) => {
         });
 });
 
-app.listen(8080, () => {
+app.get("/edit", (req, res) => {
+    // console.log("i am the edit page");
+    console.log("userid: ", req.session.userId);
+
+    // const { value } = req.params;
+
+    db.editProfile(req.session.userId)
+        .then(({ rows }) => {
+            // const selectedUser = projectsData.find(
+            //     (user) => item.dirName == project
+            // );
+
+            res.render("edit", {
+                title: "Edit your Profile",
+                layout: "main",
+                rows,
+            });
+            console.log("rows: ", rows);
+        })
+        .catch((err) => {
+            console.log(err, "error in editProfiles");
+        });
+});
+
+app.listen(process.env.PORT || 8080, () => {
     console.log("petition server is listening...");
 });

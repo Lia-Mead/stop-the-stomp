@@ -2,7 +2,16 @@
 
 const spicedPg = require("spiced-pg");
 const { dbUsername, dbPass } = require("./secrets");
-const db = spicedPg(`postgres:${dbUsername}:${dbPass}@localhost:5432/petition`);
+// const db = spicedPg(`postgres:${dbUsername}:${dbPass}@localhost:5432/petition`);
+
+let db;
+if (process.env.DATABASE_URL) {
+    // this means we are on production - heroku
+    db = spicedPg(process.env.DATABASE_URL);
+} else {
+    const { dbuser, dbbpass } = require("./secrets.json");
+    db = spicedPg(`postgres:${dbUsername}:${dbPass}@localhost:5432/petition`);
+}
 
 module.exports.getAllSigners = () => {
     const q = `SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url, signatures.signature FROM users
@@ -64,5 +73,15 @@ module.exports.insUserProf = (age, city, url, user_id) => {
     const q = `INSERT INTO user_profiles (age, city, url, user_id)
     VALUES ($1, $2, $3, $4) RETURNING id`;
     const params = [age, city, url, user_id];
+    return db.query(q, params);
+};
+
+module.exports.editProfile = (users_id) => {
+    const q = `SELECT users.id, users.first, users.last, users.email, user_profiles.age, user_profiles.city, user_profiles.url
+    FROM users
+    JOIN user_profiles
+    ON users.id = user_profiles.id
+    WHERE user_profiles.user_id = $1`;
+    const params = [users_id];
     return db.query(q, params);
 };

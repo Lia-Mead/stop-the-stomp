@@ -2,15 +2,8 @@
 
    <h2>This is my Profile page</h2>
 
-   <form method='POST' class="form-profile-box">
-                <input type="number"  name="age" placeholder="Age">
-                <input type="text"  name="city" placeholder="City">
-                <input type="text"  name="url" placeholder="https://example.com">
+   {{>form profile=true}}
 
-                <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                <button type="submit" id="btn">Submit</button>
-    </form>
-
-      <p>{{errorMessage}}</p>
+    <p>{{errorMessage}}</p>
 
 </section>
