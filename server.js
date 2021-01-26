@@ -18,7 +18,7 @@ if (process.env.cookie_secret) {
     cookie_sec = process.env.cookie_secret;
 } else {
     // we are local and will get our secrets here
-    cookie_sec = require(".secrets.json");
+    cookie_sec = require("./secrets.json");
 }
 
 const db = require("./db");
