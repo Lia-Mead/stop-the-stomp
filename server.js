@@ -18,7 +18,7 @@ if (process.env.cookie_secret) {
     cookie_sec = process.env.cookie_secret;
 } else {
     // we are local and will get our secrets here
-    cookie_sec = require("./secrets.json");
+    cookie_sec = require("./secrets.json").cookie_secret;
 }
 
 const db = require("./db");
@@ -41,7 +41,7 @@ app.use(express.static("./public"));
 app.use(
     cookieSession({
         maxAge: 1000 * 60 * 24 * 14,
-        secret: cookie_sec.sessionSecret,
+        secret: cookie_sec,
     })
 );
 
