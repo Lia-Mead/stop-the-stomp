@@ -22,16 +22,12 @@
 
                 {{#if profile}}
 
-                <div class="form-profile">
-
                         <input type="number"  name="age" placeholder="Age">
                         <input type="text"  name="city" placeholder="City">
                         <input type="text"  name="url" placeholder="https://example.com">
 
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
                         <button type="submit" id="btn">Continue</button>
-
-                </div>
 
                 {{/if}}
 
@@ -47,11 +43,9 @@
                         <input type="text"  name="city" value='{{city}}' placeholder="City">
                         <input type="text"  name="url" value='{{url}}' placeholder="https://example.com">
 
-                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-
-                        <button type="submit" id="btn">Update your Data</button>
-
                 {{/rows}}
+                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        <button type="submit" id="btn">Update your Data</button>
 
                 {{/if}}
 

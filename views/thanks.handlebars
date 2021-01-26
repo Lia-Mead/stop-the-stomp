@@ -9,6 +9,13 @@
 
     <p><a href="/signers">See all {{count}} signers</a></p>
 
-    <button type="submit" class="delete-btn">Delete</button>
+    <a href="/edit"><button type="button" class="delete-btn">Edit Profile</button></a>
+
+    <form class="form" method='POST'>
+
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <button type="submit" class="delete-btn">Delete</button>
+
+    </form>
 
 </section>

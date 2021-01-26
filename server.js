@@ -3,6 +3,8 @@ const app = express();
 const csurf = require("csurf");
 const cookieSession = require("cookie-session");
 const hb = require("express-handlebars");
+const db = require("./db");
+const { hash, compare } = require("./bc");
 // const { sessionSecret } = require("./secrets");
 
 let cookie_sec;
@@ -13,12 +15,6 @@ if (process.env.sessionSecret) {
     // we are local and will get our secrets here
     cookie_sec = require("./secrets").sessionSecret;
 }
-
-const db = require("./db");
-
-const { hash, compare } = require("./bc");
-// const bc = require("./bc");
-// bc.compare();
 
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
@@ -46,13 +42,11 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.get("/", (req, res) => {
-    if (!req.session.userId) {
-        res.redirect("/register");
-    } else if (!req.session.loggedIn && req.session.userId) {
-        res.redirect("/login");
+app.use((req, res, next) => {
+    if (!req.session.userId && req.url != "/register" && req.url != "/login") {
+        return res.redirect("/register");
     } else {
-        res.redirect("/petition");
+        next();
     }
 });
 
@@ -72,11 +66,9 @@ app.post("/register", (req, res) => {
                 .then(({ rows }) => {
                     req.session.userId = rows[0].id;
                     req.session.loggedIn = rows[0].id;
-                    // req.session.loggedIn === true; // check why not loggedin
-                    // console.log("req.session.userId", req.session.userId);
-                    console.log("i am logged in", req.session.loggedIn);
-                    console.log("cookie log in", req.session);
 
+                    // console.log("i am logged in", req.session.loggedIn);
+                    // console.log("cookie log in", req.session);
                     res.redirect("/profile");
                 })
                 .catch((err) => {
@@ -140,18 +132,21 @@ app.post("/login", (req, res) => {
                     .then((match) => {
                         // console.log("match value from compare: ", match);
                         if (match) {
-                            let signedPetition = rows[0].signature;
                             req.session.userId = rows[0].id;
-                            req.session.loggedIn = rows[0].id;
-                            console.log("rows: ", rows);
-                            console.log("rows sig: ", rows[0].signature);
-
-                            if (signedPetition) {
-                                console.log("yayy i signed");
-                                res.redirect("./thanks");
+                            req.session.loggedIn = rows[0].id; // check if necessary
+                            req.session.userId = rows[0].id;
+                            req.session.signatureId = rows[0].signature_id;
+                            // console.log("rows: ", rows);
+                            console.log(
+                                "cookie in post login: ",
+                                req.session.signatureId
+                            );
+                            if (!req.session.signatureId) {
+                                // console.log("yayy i signed");
+                                res.redirect("/petition");
                             } else {
-                                console.log("no signed");
-                                res.redirect("./petition");
+                                // console.log("no signed");
+                                res.redirect("/thanks");
                             }
                         } else {
                             res.render("login", {
@@ -175,24 +170,11 @@ app.post("/login", (req, res) => {
     }
 });
 
-// this part doenst work with inserting the sig anymore
 app.get("/petition", (req, res) => {
-    // console.log("req.session", req.session);
-    if (!req.session.userId && !req.session.loggedIn) {
-        res.redirect("/register");
-    } else if (!req.session.loggedIn && req.session.userId) {
-        res.redirect("/login");
-    } else if (req.session.loggedIn) {
-        console.log("cookie log in petition: ", req.session);
-        if (req.session.signatureId) {
-            res.redirect("/thanks");
-        } else {
-            res.render("petition", {
-                title: "Petition Page",
-                layout: "main",
-            });
-        }
-    }
+    res.render("petition", {
+        title: "Petition Page",
+        layout: "main",
+    });
 });
 
 app.post("/petition", (req, res) => {
@@ -208,7 +190,10 @@ app.post("/petition", (req, res) => {
                 .then(({ rows }) => {
                     req.session.signatureId = rows[0].id;
                     // console.log("rows[0].id", rows[0].id);
-                    // console.log("req.session", req.session);
+                    console.log(
+                        "req.session.signatureId",
+                        req.session.signatureId
+                    );
                     res.redirect("/thanks");
                 })
                 .catch((err) => {
@@ -228,6 +213,8 @@ app.post("/petition", (req, res) => {
 app.get("/thanks", (req, res) => {
     if (req.session.signatureId) {
         // check pullSig - parameter email or userId
+        console.log("cookie in get thanks: ", req.session.signatureId);
+
         Promise.all([db.pullSig(req.session.signatureId), db.numSignatures()])
             .then((results) => {
                 // console.log("results: ", results);
@@ -247,10 +234,27 @@ app.get("/thanks", (req, res) => {
     }
 });
 
+app.post("/thanks", (req, res) => {
+    console.log("post request delete signature was made");
+    console.log("signature id in post thanks", req.session.signatureId);
+    db.deleteSignature(req.session.signatureId)
+        .then(() => {
+            console.log("cookie in post thanks: ", req.session.signatureId);
+            req.session.signatureId = null;
+        })
+        .then(() => {
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("error in deleteSignature", err);
+        });
+});
+
 app.get("/signers", (req, res) => {
     // console.log("req.session: ", req.session);
     // check if the sig is in the databbase
     if (req.session.signatureId) {
+        console.log("cookie in get signers: ", req.session.signatureId);
         db.getAllSigners()
             .then(({ rows }) => {
                 // console.log("result.rows: ", rows);
@@ -287,27 +291,82 @@ app.get("/signers/:city", (req, res) => {
 });
 
 app.get("/edit", (req, res) => {
-    // console.log("i am the edit page");
-    console.log("userid: ", req.session.userId);
-
-    // const { value } = req.params;
-
+    console.log("req reg cookie: ", req.session.userId);
     db.editProfile(req.session.userId)
         .then(({ rows }) => {
-            // const selectedUser = projectsData.find(
-            //     (user) => item.dirName == project
-            // );
-
+            console.log("rows: ", rows);
             res.render("edit", {
-                title: "Edit your Profile",
+                title: "Update your profile",
                 layout: "main",
                 rows,
             });
-            console.log("rows: ", rows);
         })
         .catch((err) => {
-            console.log(err, "error in editProfiles");
+            console.log("There was an error in retrieving data from DB: ", err);
         });
+});
+
+app.post("/edit", (req, res) => {
+    // console.log("edit post made");
+    const { first, last, email, pass, age, city, url } = req.body;
+    if (pass) {
+        hash(pass)
+            .then((hashedPw) => {
+                db.insProfUpdateWithPass(
+                    req.session.userId,
+                    first,
+                    last,
+                    email,
+                    hashedPw
+                )
+                    .then(() => {
+                        db.upsertProfile(age, city, url, req.session.userId)
+                            .then(() => {
+                                if (req.session.signatureId) {
+                                    console.log(
+                                        "cookie in post edit: ",
+                                        req.session.signatureId
+                                    );
+                                    res.redirect("/thanks");
+                                } else {
+                                    res.redirect("/petition");
+                                }
+                            })
+                            .catch((err) => {
+                                console.log("error in upsertProfile", err);
+                            });
+                    })
+                    .catch((err) => {
+                        console.log("error in insProfUpdateWithPass", err);
+                    });
+            })
+            .catch((err) => {
+                console.log("error in hashing", err);
+            });
+    } else {
+        // console.log("no pass update");
+        db.insProfUpdateNoPass(req.session.userId, first, last, email)
+            .then(() => {
+                db.upsertProfile(age, city, url, req.session.userId)
+                    .then(() => {
+                        if (req.session.signatureId) {
+                            console.log(
+                                "cookie in post edit else: ",
+                                req.session.signatureId
+                            );
+                            res.redirect("/thanks");
+                        } else {
+                            res.redirect("/petition");
+                        }
+                    })
+                    .catch((err) => {
+                        console.log("error in upsertProfile", err);
+                    });
+            })
+            .catch((err) => {
+                console.log("error in insProfUpdateWithPass", err);
+            });
+    }
 });
 
 app.listen(process.env.PORT || 8080, () => {
