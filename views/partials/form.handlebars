@@ -1,7 +1,4 @@
 
-        {{!-- <section class="form"> --}}
-                {{!-- <h2>{{pageTitle}}</h2> --}}
-
         <form method='POST'>
 
                 <div class="form">
@@ -27,16 +24,15 @@
 
                 {{#if profile}}
 
-                        <input type="number"  name="age" placeholder="Age">
-                        <input type="text"  name="city" placeholder="City">
-                        <input type="text"  name="url" placeholder="https://example.com">
+                        <input type="number" min="18" max="121" name="age" placeholder="Age">
+                        <input type="text" name="city" placeholder="City">
+                        <input type="text" name="url" placeholder="https://example.com">
 
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
                         
                         <button type="submit" id="btn">Continue</button>
 
                 {{/if}}
-
 
                 {{#if edit}}
 
@@ -46,9 +42,9 @@
                         <input type='text' name='last' placeholder='Last Name' value='{{last}}'autocomplete='off'>
                         <input type='email' name='email' placeholder='E Mail' value='{{email}}' autocomplete='off'>
                         <input type='password' name='pass' placeholder='Password' autocomplete='off'>
-                        <input type="number"  name="age" value='{{age}}' placeholder="Age">
-                        <input type="text"  name="city" value='{{city}}' placeholder="City">
-                        <input type="text"  name="url" value='{{url}}' placeholder="https://example.com">
+                        <input type="number" name="age" value='{{age}}' placeholder="Age">
+                        <input type="text" name="city" value='{{city}}' placeholder="City">
+                        <input type="text" name="url" value='{{url}}' placeholder="https://example.com">
 
                 {{/rows}}
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
@@ -60,5 +56,3 @@
 
 
         </form>
-        
-        {{!-- </section> --}}

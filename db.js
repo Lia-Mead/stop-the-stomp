@@ -55,15 +55,15 @@ module.exports.numSignatures = () => {
 };
 
 module.exports.pullSig = (signature) => {
-    const q = `SELECT signature FROM signatures WHERE id = $1`;
+    const q = `SELECT signature, user_id FROM signatures WHERE id = $1`;
     const params = [signature];
     return db.query(q, params);
 };
 
 module.exports.getLoginData = (email) => {
-    const q = `SELECT users.email, users.id, users.password, signatures.signature, signatures.id AS signature_id 
+    const q = `SELECT users.id, users.password, signatures.id AS signature_id
     FROM users
-    JOIN signatures
+    LEFT JOIN signatures
     ON users.id = signatures.user_id
     WHERE email = $1`;
     const params = [email];
@@ -112,8 +112,15 @@ module.exports.upsertProfile = (age, city, url, user_id) => {
     return db.query(q, params);
 };
 
-module.exports.deleteSignature = (signatureId) => {
+module.exports.deleteSignature = (userId) => {
     const q = `DELETE FROM signatures WHERE user_id = $1`;
-    const params = [signatureId];
+    const params = [userId];
+    return db.query(q, params);
+};
+
+module.exports.getName = (userId) => {
+    const q = `SELECT users.first, users.last FROM users
+    WHERE id = $1`;
+    const params = [userId];
     return db.query(q, params);
 };
