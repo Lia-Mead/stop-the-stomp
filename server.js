@@ -1,18 +1,16 @@
 const express = require("express");
 const app = express();
+exports.app = app;
 const csurf = require("csurf");
 const cookieSession = require("cookie-session");
 const hb = require("express-handlebars");
 const db = require("./db");
 const { hash, compare } = require("./bc");
-// const { sessionSecret } = require("./secrets");
 
 let cookie_sec;
 if (process.env.sessionSecret) {
-    // we are in production
     cookie_sec = process.env.sessionSecret;
 } else {
-    // we are local and will get our secrets here
     cookie_sec = require("./secrets").sessionSecret;
 }
 
@@ -220,10 +218,12 @@ app.get("/thanks", (req, res) => {
                 // console.log("results: ", results);
                 let sigImg = results[0].rows[0].signature;
                 let count = results[1].rows[0].count;
+                let first = results[0].rows[0].first;
                 return res.render("thanks", {
                     title: "Thanks Page",
                     sigImg,
                     count,
+                    first,
                 });
             })
             .catch((err) => {
@@ -369,6 +369,12 @@ app.post("/edit", (req, res) => {
     }
 });
 
-app.listen(process.env.PORT || 8080, () => {
-    console.log("petition server is listening...");
-});
+// app.get("/logout", (req, res) => {
+//     console.log("log me out");
+// });
+
+if (require.main == module) {
+    app.listen(process.env.PORT || 8080, () => {
+        console.log("petition server is listening...");
+    });
+}

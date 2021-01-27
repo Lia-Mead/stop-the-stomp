@@ -2,13 +2,19 @@
 
    <h2>This is my registration page</h2>
 
-   {{>form signup=true login=true}}
+   {{!-- <div class="form"> --}}
+
+      {{>form signup=true login=true}}
+      
+      <p class="error-msg">{{errorMessage}}</p>
+
+   {{!-- </div> --}}
+
 
    <div class="link-con">
         <a href="/login">Already have an account? Click here to log in</a>
     </div>
 
-      <p>{{errorMessage}}</p>
 
 </section>
    

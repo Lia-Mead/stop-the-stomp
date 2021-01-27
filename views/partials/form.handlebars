@@ -1,24 +1,29 @@
 
-        <section class="form">
-                <h2>{{pageTitle}}</h2>
+        {{!-- <section class="form"> --}}
+                {{!-- <h2>{{pageTitle}}</h2> --}}
 
-                <form class="form" method='POST'>
+        <form method='POST'>
 
-                {{#if login}}
-   
-                        {{#if signup}}
-                        <input type='text' name='first' placeholder='First Name' autocomplete='off'>
-                        <input type='text' name='last' placeholder='Last Name' autocomplete='off'>
+                <div class="form">
+
+                        {{#if login}}
+        
+                                {{#if signup}}
+                                <input type='text' name='first' placeholder='First Name' autocomplete='off'>
+                                <input type='text' name='last' placeholder='Last Name' autocomplete='off'>
+                                {{/if}}
+
+                                <input type='email' name='email' placeholder='E Mail' autocomplete='off'>
+                                <input type='password' name='pass' placeholder='Password' autocomplete='off'>
+
+                                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+                                <button id="btn">{{#if signup}}Sign Up{{else}}login{{/if}}</button>
+
                         {{/if}}
+                </div>
 
-                        <input type='email' name='email' placeholder='E Mail' autocomplete='off'>
-                        <input type='password' name='pass' placeholder='Password' autocomplete='off'>
-
-                        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-
-                        <button id="btn">{{#if signup}}Sign Up{{else}}login{{/if}}</button>
-
-                {{/if}}
+                <div class="form-profile">
 
                 {{#if profile}}
 
@@ -27,9 +32,11 @@
                         <input type="text"  name="url" placeholder="https://example.com">
 
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                        
                         <button type="submit" id="btn">Continue</button>
 
                 {{/if}}
+
 
                 {{#if edit}}
 
@@ -49,6 +56,9 @@
 
                 {{/if}}
 
-                </form>
+                </div>
+
+
+        </form>
         
-        </section>
+        {{!-- </section> --}}

@@ -1,20 +1,22 @@
 
 <section class="form-page">
 
-    <h1>Thank you for signing</h1>
+    <img src="" alt="">
 
-    <h2></h2>
+    <h1>Thank You {{first}} for Signing</h1>
+
+    <h2>Unite for Better City Life Quality</h2>
 
     <img class="canvas-img" src="{{sigImg}}" alt="signature-image">
 
-    <p><a href="/signers">See all {{count}} signers</a></p>
+    <p class="link"><a href="/signers">See all {{count}} signers</a></p>
 
-    <a href="/edit"><button type="button" class="delete-btn">Edit Profile</button></a>
+    <a href="/edit"><button type="button" id="btn">Edit Profile</button></a>
 
     <form class="form" method='POST'>
 
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        <button type="submit" class="delete-btn">Delete</button>
+        <button type="submit" class="delete-btn">Delete Signature</button>
 
     </form>
 
