@@ -47,7 +47,7 @@ const requireLoggedInUser = (req, res, next) => {
     } else {
         next();
     }
-}; // runs for every single requests we receive
+};
 
 const requireSignature = (req, res, next) => {
     if (!req.session.signatureId) {
@@ -158,7 +158,7 @@ app.get("/login", requireLoggedOutUser, (req, res) => {
 
 app.post("/login", requireLoggedOutUser, (req, res) => {
     const { email, pass } = req.body;
-    console.log("email, pass", email, pass);
+    // console.log("email, pass", email, pass);
     // if (email) {
     db.getLoginData(email)
         .then(({ rows }) => {
@@ -272,10 +272,15 @@ app.get("/signers", requireSignature, (req, res) => {
     db.getAllSigners()
         .then(({ rows }) => {
             // console.log("result.rows: ", rows);
+            let currentUser = rows.find((row) => {
+                return row.id === req.session.userId;
+            });
+            let first = currentUser.first;
             res.render("signers", {
                 title: "Signers Page",
                 layout: "main",
                 rows,
+                first,
             });
         })
         .catch((err) => {
@@ -304,10 +309,12 @@ app.get("/signers/:city", requireSignature, (req, res) => {
 app.get("/edit", requireLoggedInUser, (req, res) => {
     db.editProfile(req.session.userId)
         .then(({ rows }) => {
+            let first = rows[0].first;
             res.render("edit", {
                 title: "Update your profile",
                 layout: "main",
                 rows,
+                first,
             });
         })
         .catch((err) => {

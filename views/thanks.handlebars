@@ -1,27 +1,37 @@
 
 <section id="body-main" class="thanks-img">
 
-<header>{{>menu in="true"}}</header>
+<header>{{>menu in=true sig=true}}</header>
+
+<div class="wrap">
+
+        {{!-- <div class="center-con"> --}}
+
+
+            <div class="form-page">
 
     <h1>Thank You for Signing <span class="cap">{{first}}</span></h1>
+            <h2>Unite for a Better City Life Quality</h2>
+            <img class="canvas-show" src="{{sigImg}}" alt="signature-image">
 
-    <h2>Unite for a Better City Life Quality</h2>
-    <div class="form-page">
+            <p class="link"><a href="/signers">See all {{count}} signers</a></p>
 
-    <img class="canvas-img" src="{{sigImg}}" alt="signature-image">
+            <a href="/edit"><button type="button" id="btn">Edit Profile</button></a>
 
-    <p class="link"><a href="/signers">See all {{count}} signers</a></p>
+            <form class="form" method='POST'>
 
-    <a href="/edit"><button type="button" id="btn">Edit Profile</button></a>
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
-    <form class="form" method='POST'>
+                <button type="submit" class="delete-btn">Delete Signature</button>
 
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            </form>
 
-        <button type="submit" class="delete-btn">Delete Signature</button>
+            </div>
 
-    </form>
+        {{!-- </div> --}}
 
-    </div>
+</div>
+
+
 
 </section>

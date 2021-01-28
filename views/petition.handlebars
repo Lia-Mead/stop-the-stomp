@@ -1,12 +1,13 @@
 
 <section id="body-main" class="petition-img">
 
-        <header>{{>menu in="true"}}</header>
+        <header>{{>menu in=true}}</header>
 
+<div class="wrap">
 
         <div class="center-con">
 
-        <div class='headline-sec'>
+        <div class='headline'>
                 <p>Elephants belong in the Savanna
                 <br>Not Above Your Head</p>
         </div>
@@ -17,7 +18,6 @@
                         <input id="sig-id" type="hidden" name="signature">
                         
                         <canvas id="canvas" width="400" height="120"></canvas>
-                        {{!-- <button type="submit" class="delete-btn">Reset Signature</button> --}}
 
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
                         <button class="glow" type="submit"> submit </button>
@@ -29,5 +29,7 @@
                 <script src="/sig-canvas.js"></script>
 
         </div>
+
+</div>
 
 </section>

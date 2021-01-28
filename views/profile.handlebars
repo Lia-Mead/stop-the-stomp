@@ -1,11 +1,16 @@
 <section id="body-main" class="montage-img">
 
-    <header>{{>menu in="true"}}</header>
+    <header>{{>menu in=true sig=true name=true}}</header>
 
-   <h2>Do you want to tell us a bit more about yourself?</h2>
+    <div class="center-con">
 
-   {{>form profile=true}}
+    <h2>Do you want to tell us a bit more about yourself?</h2>
 
-    <p>{{errorMessage}}</p>
+        {{>form profile=true}}
+
+    </div>
+
+
+    <p class="error-msg">{{errorMessage}}</p>
 
 </section>

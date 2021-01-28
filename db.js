@@ -14,7 +14,7 @@ if (process.env.DATABASE_URL) {
 }
 
 module.exports.getAllSigners = () => {
-    const q = `SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url FROM signatures
+    const q = `SELECT users.id, users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url FROM signatures
     JOIN users
     ON users.id = signatures.user_id
     LEFT JOIN user_profiles
@@ -44,7 +44,7 @@ module.exports.insertRegData = (first, last, email, hashedPw) => {
     const q = `INSERT INTO users (first, last, email, password)
     VALUES ($1, $2, $3, $4) RETURNING id`;
     const params = [first, last, email, hashedPw];
-    console.log("params", params);
+    // console.log("params", params);
     return db.query(q, params);
 };
 
