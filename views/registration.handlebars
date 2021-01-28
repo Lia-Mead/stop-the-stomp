@@ -1,22 +1,27 @@
-<section class="form-page">
+<section id="body-main" class="welcome-img">
 
-   <h2>This is my registration page</h2>
+   <header>{{>menu login="true"}}</header>
+
+   <div class='headline'>
+                <p>Elephants belong in the Savanna
+                <br>or on Ground Level
+                </p>
+        </div>
+        <h1>Force Stomping Neighbors to Live on the Ground Floor</h1>
+
+   <h2>Please Register Page</h2>
 
    {{!-- <div class="form"> --}}
       <p class="error-msg">{{errorMessage}}</p>
 
       {{>form signup=true login=true}}
       
-      <p class="error-msg">{{errorMessage}}</p>
-
    {{!-- </div> --}}
 
    <div class="link-con">
         <a href="/login">Already have an account? Click here to log in</a>
     </div>
 
-
 </section>
-   
    
 

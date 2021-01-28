@@ -1,21 +1,25 @@
-   <section class="form-page">
+      
+   <section class="welcome-img" id="body-main">
 
-      <h2>Liat's users want to Log in</h2>
+            <header>{{>menu login="true"}}</header>
 
-      {{!-- <div class="form"> --}}
+
+      <div class='headline'>
+                <p>Elephants belong in the Savanna
+                <br>or on Ground Level
+                </p>
+        </div>
+        <h1>Force Stomping Neighbors to Live on the Ground Floor</h1>
+
+      <h2>Please Log in</h2>
+
          <p class="error-msg">{{errorMessage}}</p>
 
          {{>form login=true}}
 
-         <p class="error-msg">{{errorMessage}}</p>
-
-      {{!-- </div> --}}
-
       <div class="link-con">
         <a href="/register">Don't have an account yet? Click here to register</a>
      </div>
-
-      
 
    </section>
    

@@ -1,3 +1,10 @@
 <nav>
-    <a href="/logout">Logout</a>
+    {{#if logout}}<a href="/login">Login</a>{{/if}}
+
+    {{#if login}}
+    <li><a href="/logout">Logout</a></li>
+    <li><a href="/edit">Edit Profile</a></li>
+    <li><a href="/thanks">Thanks</a></li>
+    <li><a href="/signers">Signers</a></li>
+    {{/if}}
 </nav>

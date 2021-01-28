@@ -6,6 +6,7 @@ const cookieSession = require("cookie-session");
 const hb = require("express-handlebars");
 const db = require("./db");
 const { hash, compare } = require("./bc");
+const fn = require("./fn");
 
 let cookie_sec;
 if (process.env.sessionSecret) {
@@ -120,6 +121,8 @@ app.get("/profile", requireLoggedInUser, (req, res) => {
 app.post("/profile", requireLoggedInUser, (req, res) => {
     // console.log("profile post request made");
     let { age, city, url } = req.body;
+    age === "" ? (age = null) : age;
+    // city === null ? (city = "") : city;
 
     if (url.startsWith("http://") || url.startsWith("https://")) {
         url = req.body.url;
@@ -127,9 +130,10 @@ app.post("/profile", requireLoggedInUser, (req, res) => {
         url = "";
     }
 
-    if (age == "") {
-        age = Number(req.body.age);
+    if (city != "") {
+        city = fn.capitalizeLetters(city);
     }
+    // console.log("city: ", city);
 
     db.insUserProf(age, city, url, req.session.userId)
         .then(() => {
@@ -156,43 +160,43 @@ app.get("/login", requireLoggedOutUser, (req, res) => {
 app.post("/login", requireLoggedOutUser, (req, res) => {
     const { email, pass } = req.body;
     console.log("email, pass", email, pass);
-    if (email) {
-        db.getLoginData(email)
-            .then(({ rows }) => {
-                // console.log("rows in login ", rows);
-                const hashedPw = rows[0].password;
-                compare(pass, hashedPw)
-                    .then((match) => {
-                        if (match) {
-                            req.session.userId = rows[0].id;
-                            req.session.loggedIn = rows[0].id;
-                            req.session.signatureId = rows[0].signature_id;
+    // if (email) {
+    db.getLoginData(email)
+        .then(({ rows }) => {
+            // console.log("rows in login ", rows);
+            const hashedPw = rows[0].password;
+            compare(pass, hashedPw)
+                .then((match) => {
+                    if (match) {
+                        req.session.userId = rows[0].id;
+                        req.session.loggedIn = rows[0].id;
+                        req.session.signatureId = rows[0].signature_id;
 
-                            if (!req.session.signatureId) {
-                                res.redirect("/petition");
-                            } else {
-                                res.redirect("/thanks");
-                            }
+                        if (!req.session.signatureId) {
+                            res.redirect("/petition");
                         } else {
-                            res.render("login", {
-                                title: "Login Page",
-                                errorMessage:
-                                    "Something went wrong, wrong password",
-                            });
+                            res.redirect("/thanks");
                         }
-                    })
-                    .catch((err) => {
-                        console.log("err in compare", err);
-                    });
-            })
-            .catch((err) => {
-                console.log("err in login data", err);
-                res.render("login", {
-                    title: "Login Page",
-                    errorMessage: "Something went wrong, wrong email",
+                    } else {
+                        res.render("login", {
+                            title: "Login Page",
+                            errorMessage:
+                                "Something went wrong, wrong password",
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log("err in compare", err);
                 });
+        })
+        .catch((err) => {
+            console.log("err in login data", err);
+            res.render("login", {
+                title: "Login Page",
+                errorMessage: "Something went wrong, wrong email",
             });
-    }
+        });
+    // }
 });
 
 app.get("/petition", requireNoSignature, requireLoggedInUser, (req, res) => {
@@ -320,6 +324,11 @@ app.get("/edit", requireLoggedInUser, (req, res) => {
 app.post("/edit", requireLoggedInUser, (req, res) => {
     // console.log("edit post made");
     let { first, last, email, pass, age, city, url } = req.body;
+    age === "" ? (age = null) : age;
+
+    if (city != "") {
+        city = fn.capitalizeLetters(city);
+    }
 
     if (pass) {
         hash(pass)
@@ -332,9 +341,6 @@ app.post("/edit", requireLoggedInUser, (req, res) => {
                     hashedPw
                 )
                     .then(() => {
-                        if (age == "") {
-                            age = Number(req.body.age);
-                        }
                         db.upsertProfile(age, city, url, req.session.userId)
                             .then(() => {
                                 if (req.session.signatureId) {
@@ -357,9 +363,6 @@ app.post("/edit", requireLoggedInUser, (req, res) => {
     } else {
         db.insProfUpdateNoPass(req.session.userId, first, last, email)
             .then(() => {
-                if (age == "") {
-                    age = Number(req.body.age);
-                }
                 db.upsertProfile(age, city, url, req.session.userId)
                     .then(() => {
                         if (req.session.signatureId) {

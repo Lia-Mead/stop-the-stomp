@@ -44,6 +44,7 @@ h2 {
     color: #02ff84;
     letter-spacing: 0.1em;
     font-weight: 100;
+    text-align: center;
 }
 
 .headline {
@@ -57,12 +58,9 @@ h2 {
     color: transparent;
     -webkit-text-stroke-width: 3px;
     -webkit-text-stroke-color: white;
-    white-space: nowrap;
     text-shadow: 4px 3px 0px #009688, 9px 8px 0px rgba(0, 0, 0, 0.15);
     font-family: proxima-nova-1, proxima-nova-2, montserrat, Helve;
     text-align: center;
-    /* width: 80%;
-    overflow: hidden; */
 }
 
 .headline-sec {
@@ -76,7 +74,6 @@ h2 {
     color: transparent;
     -webkit-text-stroke-width: 3px;
     -webkit-text-stroke-color: white;
-    white-space: nowrap;
     text-shadow: 4px 3px 0px #b09c60, 9px 8px 0px rgb(0 0 0 / 15%);
     font-family: proxima-nova-1, proxima-nova-2, montserrat, Helve;
     text-align: center;
@@ -131,8 +128,8 @@ h2 {
 }
 
 #btn {
-    /* width: 40%; */
-    padding: 16px;
+    min-width: 20%;
+    padding: 16px 20px;
     height: 60px;
     font-size: 1.3em;
     background: transparent;
@@ -186,7 +183,6 @@ h2 {
 }
 
 .delete-btn {
-    /* width: 220px; */
     height: 50px;
     outline: none;
     color: #fff;
@@ -316,26 +312,54 @@ input {
 }
 
 .petition-img {
-    /* width: 100%; */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)),
+        url(/images/elephant3.jpg);
+    background-position: center center;
+}
+
+img {
+    width: 100%;
+    height: auto;
     object-fit: cover;
     background-repeat: no-repeat;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
-        url("/images/elephant3.jpg");
+}
+
+.welcome-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)),
+        url(/images/elephant3.jpg);
+    background-position: center center;
 }
 
 .link-con {
     margin: 20px 10px;
     color: #4caf50;
+    cursor: pointer;
+    text-align: center;
+}
+
+li {
+    list-style-type: none;
 }
 
 a {
-    text-decoration: none;
+    /* text-decoration: none; */
     color: #65fde9;
     margin: 20px 0;
 }
 
-a:-webkit-any-link:active {
-    color: #08b18c;
+li,
+a:hover {
+    cursor: pointer;
+}
+
+nav {
+    display: flex;
+    justify-content: flex-end;
+    align-content: space-around;
 }
 
 .signers-box {
@@ -358,5 +382,5 @@ a:-webkit-any-link:active {
 
 .error-msg {
     color: #8a55e9;
-    margin-top: 20px;
+    margin: 20px;
 }
