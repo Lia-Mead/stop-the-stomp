@@ -122,7 +122,6 @@ app.post("/profile", requireLoggedInUser, (req, res) => {
     // console.log("profile post request made");
     let { age, city, url } = req.body;
     age === "" ? (age = null) : age;
-    // city === null ? (city = "") : city;
 
     if (url.startsWith("http://") || url.startsWith("https://")) {
         url = req.body.url;
@@ -225,8 +224,7 @@ app.post("/petition", requireNoSignature, requireLoggedInUser, (req, res) => {
         } else {
             res.render("petition", {
                 title: "Petition Page",
-                errorMessage:
-                    "There was an error, please fill out all the fields",
+                errorMessage: "Please sign to show you care",
             });
         }
     }
@@ -246,7 +244,6 @@ app.get("/thanks", requireSignature, (req, res) => {
             let first = results[2].rows[0].first;
 
             // console.log("rows: ", rows);
-            // console.log("first:", first);
             return res.render("thanks", {
                 title: "Thank You Page",
                 sigImg,
@@ -260,8 +257,6 @@ app.get("/thanks", requireSignature, (req, res) => {
 });
 
 app.post("/thanks", (req, res) => {
-    // console.log("post request delete signature was made");
-    // console.log("signature id in post thanks", req.session);
     db.deleteSignature(req.session.userId)
         .then(() => {
             req.session.signatureId = null;
@@ -274,7 +269,6 @@ app.post("/thanks", (req, res) => {
 
 app.get("/signers", requireSignature, (req, res) => {
     // console.log("req.session: ", req.session);
-    // console.log("cookie in get signers: ", req.session.signatureId);
     db.getAllSigners()
         .then(({ rows }) => {
             // console.log("result.rows: ", rows);

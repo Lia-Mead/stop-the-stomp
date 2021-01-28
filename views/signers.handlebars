@@ -1,18 +1,20 @@
 
-<section id="body-main" class="form-page">
+<section id="body-main" class="">
+
+    <header>{{>menu in="true"}}</header>
     
    <h1>All These Good People</h1>
-    <h2>Click on a city link to view all signers in a specific location</h2>
+    {{!-- <p class="int">Click on a name to land on a signer's website,<br>
+        or on a city to view all signers in your location</p> --}}
 
     <div class="signers-box">
     {{#rows}}
         <p class="signer-elem">
-            <a class="fade" href="{{url}}">{{first}} {{last}}</a> {{age}}<a class="signer-elem" href="/signers/{{city}}">{{city}}</a>
+            <a class="text" href="{{url}}" target="_blank" rel="noopener noreferrer">{{first}} {{last}}</a>
+            {{age}}
+            <a class="signer-elem" href="/signers/{{city}}">{{city}}</a>
         </p>
     {{/rows}}
     </div>
 
 </section>
-   
-   
-

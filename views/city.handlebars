@@ -1,14 +1,19 @@
 
-<section class="form-page" id="body-main">
-   <h1>Other Good Souls in Your City</h1>
+<section id="body-main" class="">
+
+    <header>{{>menu in="true"}}</header>
+   <h1>Other Good Souls in <span class="cap">{{city}}</span></h1>
 
     <div class="signers-box">
     {{#rows}}
         <p class="signer-elem">
-            <a class="fade" href="{{url}}">{{first}} {{last}}</a> {{age}}<a class="signer-elem" href="/signers">{{city}}</a>
+            <a class="fade" href="{{url}}" >{{first}} {{last}}</a> {{age}}
         </p>
     {{/rows}}
     </div>
 
 </section>
 
+  {{!-- <p class="signer-elem">
+            <a class="fade" href="{{url}}" target="_blank" rel="noopener noreferrer">{{first}} {{last}}</a> {{age}}
+        </p> --}}

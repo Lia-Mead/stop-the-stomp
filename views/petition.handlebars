@@ -1,26 +1,30 @@
 
-<section class="main-page petition-img">
+<section id="body-main" class="petition-img">
 
-        <div class="petition-con">
+        <header>{{>menu in="true"}}</header>
 
+
+        <div class="center-con">
 
         <div class='headline-sec'>
                 <p>Elephants belong in the Savanna
-                <br>Not Above Your Head
-                </p>
+                <br>Not Above Your Head</p>
         </div>
-        <h1>Force Stomping Neighbors to Live on the Ground Floor</h1>
+        <h1>Stomping Neighbors to Live on the Ground Floor</h1>
 
                 <form class="sig-page" method='POST'>
                         <h2>Sign Here to Create Change</h2>
                         <input id="sig-id" type="hidden" name="signature">
                         
                         <canvas id="canvas" width="400" height="120"></canvas>
+                        {{!-- <button type="submit" class="delete-btn">Reset Signature</button> --}}
+
                         <input type="hidden" name="_csrf" value="{{csrfToken}}">
                         <button class="glow" type="submit"> submit </button>
+
                 </form>
 
-                <p>{{errorMessage}}</p>
+                <p class="error-msg">{{errorMessage}}</p>
 
                 <script src="/sig-canvas.js"></script>
 

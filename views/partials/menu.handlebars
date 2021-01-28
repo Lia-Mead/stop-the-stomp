@@ -1,10 +1,14 @@
 <nav>
-    {{#if logout}}<a href="/login">Login</a>{{/if}}
+    <ul>
+    {{#if out}}<li></li><a href="/login">Log In</a></li>{{/if}}
+    {{#if signup}}<li></li><a href="/register">Sign Up</a></li>{{/if}}
 
-    {{#if login}}
-    <li><a href="/logout">Logout</a></li>
-    <li><a href="/edit">Edit Profile</a></li>
-    <li><a href="/thanks">Thanks</a></li>
-    <li><a href="/signers">Signers</a></li>
+    {{#if in}}
+        <span class="flamingo">Good to see you <span class="cap">{{first}}</span></span>
+        <li><a href="/logout">Logout</a></li>
+        <li><a href="/edit">Edit Profile</a></li>
+        <li><a href="/thanks">Thanks</a></li>
+        <li><a href="/signers">Signers</a></li>
+    </ul>
     {{/if}}
 </nav>

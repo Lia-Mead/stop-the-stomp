@@ -14,20 +14,20 @@ if (process.env.DATABASE_URL) {
 }
 
 module.exports.getAllSigners = () => {
-    const q = `SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url, signatures.signature FROM users
+    const q = `SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url FROM signatures
+    JOIN users
+    ON users.id = signatures.user_id
     LEFT JOIN user_profiles
-    ON users.id = user_profiles.user_id
-    LEFT JOIN signatures
-    ON users.id = signatures.user_id`;
+    ON user_profiles.user_id = signatures.user_id`;
     return db.query(q);
 };
 
 module.exports.filterByCity = (city) => {
-    const q = `SELECT users.first, users.last, user_profiles.age, user_profiles.city, user_profiles.url, signatures.signature FROM users
-    JOIN user_profiles
-    ON users.id = user_profiles.user_id
-    JOIN signatures
+    const q = `SELECT users.first, users.last, user_profiles.age, user_profiles.url, user_profiles.city FROM signatures
+    JOIN users
     ON users.id = signatures.user_id
+    LEFT JOIN user_profiles
+    ON user_profiles.user_id = signatures.user_id
     WHERE LOWER(user_profiles.city) = LOWER($1)`;
     const params = [city];
     return db.query(q, params);

@@ -1,11 +1,12 @@
 
-<section id="body-main" class="form-page">
+<section id="body-main" class="thanks-img">
 
-<header>{{>menu login="true"}}</header>
+<header>{{>menu in="true"}}</header>
 
-    <h1>Thank You {{first}} for Signing</h1>
+    <h1>Thank You for Signing <span class="cap">{{first}}</span></h1>
 
     <h2>Unite for a Better City Life Quality</h2>
+    <div class="form-page">
 
     <img class="canvas-img" src="{{sigImg}}" alt="signature-image">
 
@@ -16,8 +17,11 @@
     <form class="form" method='POST'>
 
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
         <button type="submit" class="delete-btn">Delete Signature</button>
 
     </form>
+
+    </div>
 
 </section>
