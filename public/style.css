@@ -410,7 +410,7 @@ img {
 a {
     text-decoration: none;
     color: #65fde9;
-    margin: 20px;
+    margin: 20px 5px;
     cursor: pointer;
 }
 
@@ -428,6 +428,10 @@ nav ul {
 nav ul li {
     text-decoration: underline;
     list-style-type: none;
+}
+
+nav ul li a {
+    margin: 20px;
 }
 
 .signers-box {

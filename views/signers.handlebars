@@ -10,10 +10,7 @@
         <p class="signer-elem">
 
             {{#if url}}
-            
-            <a class="text" href="{{url}}" target="_blank" rel="noopener noreferrer">{{first}} {{last}}</a>
-            {{age}}{{else}}{{first}} {{last}} {{age}}<a href="/signers/{{city}}">{{city}}</a>
-            
+            <a href="{{url}}" target="_blank" rel="noopener noreferrer">{{first}} {{last}}</a> {{age}}{{else}}{{first}} {{last}} {{age}}<a href="/signers/{{city}}">{{city}}</a>
             {{/if}}
 
         </p>
