@@ -99,7 +99,7 @@ app.post("/register", requireLoggedOutUser, (req, res) => {
                     console.log("error in insert reg data", err);
                     res.render("registration", {
                         title: "Sign Up Page",
-                        errorMessage: "Something went wrong in the DB.",
+                        errorMessage: "Something went wrong, try again.",
                     });
                 });
         });
@@ -158,8 +158,6 @@ app.get("/login", requireLoggedOutUser, (req, res) => {
 
 app.post("/login", requireLoggedOutUser, (req, res) => {
     const { email, pass } = req.body;
-    // console.log("email, pass", email, pass);
-    // if (email) {
     db.getLoginData(email)
         .then(({ rows }) => {
             // console.log("rows in login ", rows);
@@ -179,8 +177,7 @@ app.post("/login", requireLoggedOutUser, (req, res) => {
                     } else {
                         res.render("login", {
                             title: "Login Page",
-                            errorMessage:
-                                "Something went wrong, wrong password",
+                            errorMessage: "Something went wrong, try again",
                         });
                     }
                 })
@@ -192,10 +189,9 @@ app.post("/login", requireLoggedOutUser, (req, res) => {
             console.log("err in login data", err);
             res.render("login", {
                 title: "Login Page",
-                errorMessage: "Something went wrong, wrong email",
+                errorMessage: "Something went wrong, try again",
             });
         });
-    // }
 });
 
 app.get("/petition", requireNoSignature, requireLoggedInUser, (req, res) => {
@@ -209,7 +205,6 @@ app.post("/petition", requireNoSignature, requireLoggedInUser, (req, res) => {
     // console.log("req.body", req.body);
     // console.log("req.session", req.session);
     const { signature } = req.body;
-    // const { first, last, signature } = req.body;
     if (req.session.userId && req.session.loggedIn) {
         // console.log("cookie log in", req.session);
         if (signature) {
